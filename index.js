@@ -42,6 +42,12 @@ app.use(recepieMapRoutes);
 const taxMapRoutes = require('./routers/taxMap')
 app.use(taxMapRoutes);
 
+const bTypeRoutes = require('./routers/bType')
+app.use(bTypeRoutes);
+
+const stakeHolder = require('./routers/stakeHolder')
+app.use(stakeHolder);
+
 app.use((error, req, res, next) => {
     console.error(error)
     if (res.headersSent) {
