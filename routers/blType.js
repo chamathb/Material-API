@@ -17,21 +17,21 @@ const schema = Joi.object().keys({
             Parent_ID: Joi.string().max(36).allow(null).allow(''),
 })
 
-router.get('/:Client_ID/bType/', function (req, res, next) {
-    dbConnection.query('SELECT * FROM BlTypes WHERE Client_ID = ?', req.params.Client_ID, function (error, results,fields){
+router.get('/:Client_ID/blType/', function (req, res, next) {
+    dbConnection.query('SELECT * FROM BlType WHERE Client_ID = ?', req.params.Client_ID, function (error, results,fields){
         if(error) return next(error);
         if(!results || results.length == 0) return res.status(HTTP_STATUS.NOT_FOUND).send();
         return res.send(results)
     })
 })
 
-router.get('/:Client_ID/bType/:ID', function (req, res, next) {
-    dbConnection.query('SELECT * FROM BlTypes WHERE ID = ? AND Client_ID = ?', [req.params.ID, req.params.Client_ID], function(error, results, fields) {
+router.get('/:Client_ID/blType/:ID', function (req, res, next) {
+    dbConnection.query('SELECT * FROM BlType WHERE ID = ? AND Client_ID = ?', [req.params.ID, req.params.Client_ID], function(error, results, fields) {
         if(error) return next(error);
         if (!results || results.length == 0) return res.status(HTTP_STAUS.NOT_FOUND).send()
         var result = results[0];
         
-        var bType = {
+        var blType = {
             ID : results.ID,
             BlTypes : result.BlTypes,
             Strategy : result.Strategy,
@@ -50,8 +50,20 @@ router.get('/:Client_ID/bType/:ID', function (req, res, next) {
 
 })
 
-router.post('/:Client_ID/bType/', function(req, res, next) {
-    if(!req.body) return res.status(HTTP_STATUS.BAD_REQUEST).send();
+router.post('/:Client_ID/blType/', function(req, res, next) {
+    //if(!req.body) return res.status(HTTP_STATUS.BAD_REQUEST).send();
+
+    let blTypeS = req.body;
+
+    if(!blTypeS) {
+        res.status(400).send({
+            error : true,
+            message : 'Please provide Bl Types'
+        });
+
+        res.end();
+        return
+    }
 
     const uuidv4 = require('uuid/v4')
     let USER_ID = req.header('InitiatedBy')
@@ -66,7 +78,7 @@ router.post('/:Client_ID/bType/', function(req, res, next) {
             return res.status(HTTP_Status.BAD_REQUEST).send(err);
         }
 
-        var bType = {
+        var blType = {
             ID : ID,
             BlTypes : req.body.BlTypes,
             Strategy : req.body.Strategy,
@@ -84,7 +96,7 @@ router.post('/:Client_ID/bType/', function(req, res, next) {
 
             if(err) return next(err);
 
-            var post = dbConnection.query("INSERT INTO BlTypes SET ? ", bType, function(errBltypes, result) {
+            var post = dbConnection.query("INSERT INTO BlType SET ? ", blType, function(errBltypes, result) {
                 if(errBltypes) {
                     dbConnection.rollback(function() {
                         console.error(errBltypes);
@@ -113,7 +125,7 @@ router.post('/:Client_ID/bType/', function(req, res, next) {
 })
 
 
-router.put('/:Client_ID/bType/', function(req, res, next) {
+router.put('/:Client_ID/blType/', function(req, res, next) {
     console.error( req.body)
     console.error('1');
     if (!req.body) return res.status(HTTP_STATUS.BAD_REQUEST).send();
@@ -133,7 +145,7 @@ router.put('/:Client_ID/bType/', function(req, res, next) {
             return res.status(HTTP_STATUS.BAD_REQUEST).send(err);
         } 
 
-        var bType = {
+        var blType = {
             ID : ID,
             BlTypes : req.body.BlTypes,
             Strategy : req.body.Strategy,
@@ -152,7 +164,7 @@ router.put('/:Client_ID/bType/', function(req, res, next) {
         dbConnection.beginTransaction(function (err) {
             console.error('7');
             if (err) return next(err);
-            dbConnection.query("UPDATE BlTypes SET IsActive = 0 WHERE ID = ? AND Client_ID = ?" , [PARENT_ID, req.params.Client_ID], function (errorUpdate , results, fields) {
+            dbConnection.query("UPDATE BlType SET IsActive = 0 WHERE ID = ? AND Client_ID = ?" , [PARENT_ID, req.params.Client_ID], function (errorUpdate , results, fields) {
                 if(errorUpdate) {
                     dbConnection.rollback(function () {
                     console.error(errorUpdate);
@@ -160,7 +172,7 @@ router.put('/:Client_ID/bType/', function(req, res, next) {
                     });
                 };
 
-                var query = dbConnection.query("INSERT INTO BlTypes SET ? ", bType, function(errBltypes, result) {
+                var query = dbConnection.query("INSERT INTO BlType SET ? ", blType, function(errBltypes, result) {
                     if (errBltypes) {
                         dbConnection.rollback(function() {
                             console.error(errBltypes);
@@ -193,7 +205,7 @@ router.put('/:Client_ID/bType/', function(req, res, next) {
     })
 })
 
-router.delete('/:Client_ID/bType/:ID', function(req, res) {
+router.delete('/:Client_ID/blType/:ID', function(req, res) {
     var deletequry = dbConnection.query("UPDATE BlTypes SET IsDeleted = 0, IsActive =  0 WHERE ID = ? AND Client_ID = ? ", [req.params.ID, req.params.Client_ID], function (error, results, fields) {
         if (error) {
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(error);
@@ -210,7 +222,7 @@ router.delete('/:Client_ID/bType/:ID', function(req, res) {
     console.log(deletequry.sql);
 })
 /*
-router.delete('/:Client_ID/bType/:ID', function(req, res) {
+router.delete('/:Client_ID/blType/:ID', function(req, res) {
     console.error('1');
     dbConnection.query("UPDATE BlTypes SET WHERE ID = ? AND Client_ID = ?", [req.params.Client_ID], function (errorUpdate, results, fields) {
       if (error) {

@@ -6,7 +6,8 @@ const Joi = require('@hapi/joi');
 
 router.get('/:Client_ID/stakeHolder/', function (req, res, next) {
     dbConnection.query('SELECT * FROM Stakeholder WHERE Client_ID = IsActive = 1', req.params.Client_ID, function(error, results, fields) {
-        if (error) return next(error);
+    //dbConnection.query('SELECT * FROM Stakeholder WHERE Client_ID = ?', req.params.Client_ID, function(error, results, fields) { 
+    if (error) return next(error);
         if (!results || results.length == 0) return res.status(404).send()
         return res.send(results)
     });
@@ -91,7 +92,7 @@ router.post('/:Client_ID/stakeHolder', function (req, res) {
         IsActive: 1
     } 
 
- var postsql=    dbConnection.query("INSERT INTO Stakeholder SET ?", sholder, function (error, results, fields) {
+ var postsql =    dbConnection.query("INSERT INTO Stakeholder SET ?", sholder, function (error, results, fields) {
     
 
         if(error) {

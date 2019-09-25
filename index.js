@@ -42,8 +42,11 @@ app.use(recepieMapRoutes);
 const taxMapRoutes = require('./routers/taxMap')
 app.use(taxMapRoutes);
 
-const bTypeRoutes = require('./routers/bType')
-app.use(bTypeRoutes);
+const blTypeRoutes = require('./routers/blType')
+app.use(blTypeRoutes);
+
+//const bTypeRoutes = require('./routers/bType')
+//app.use(bTypeRoutes);
 
 const stakeHolder = require('./routers/stakeHolder')
 app.use(stakeHolder);
