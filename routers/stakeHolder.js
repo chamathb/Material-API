@@ -203,7 +203,7 @@ router.put('/:Client_ID/stakeHolder', function (req, res) {
            var putsql =  dbConnection.query("INSERT INTO BRIDGE.Stakeholder SET ?", copyStakeholder, function (error, results, fields) {
 
                 console.log(error);
-                console.log(putsql.sql);
+               // console.log(putsql.sql);
 
                 if (error) {
                     dbConnection.rollback(function() {
