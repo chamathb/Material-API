@@ -206,9 +206,9 @@ router.put('/:Client_ID/regapproval', function (req, res) {
 
                     let attachment = {
                         RegulatoryApproval_ID: APPROVAL_ID,
-                        DocumentName: attachments[k].DocumentName,
-                        Description: attachments[k].Description,
-                        Mandatory: attachments[k].Mandatory
+                        DocumentName: req.body.attachments[k].DocumentName,
+                        Description: req.body.attachments[k].Description,
+                        Mandatory: req.body.attachments[k].Mandatory
                     }
 
                     dbConnection.query("INSERT INTO RegulatoryAttachments SET ?", attachment, function(error, results, fields) {

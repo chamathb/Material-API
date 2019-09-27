@@ -1,3 +1,94 @@
+/*var express = require('express');
+const router = express.Router();
+const dbConnection = require('./database')
+const Joi = require('@hapi/joi');
+const { HTTP_STATUS } = require('./constents');
+
+const schema = Joi.object().keys({
+            ID: Joi.string().min(2).max(36).required(),
+            BlTypes : Joi.string().required(),
+            Strategy : Joi.string().required(),
+            Description : Joi.string().required(),
+            Status : Joi.string().required(), 
+            Client_ID : Joi.string().required(),     
+            Created_By : Joi.string().allow(null),
+            IsDeleted: Joi.boolean(),
+            IsActive: Joi.boolean(),
+            Parent_ID: Joi.string().max(36).allow(null).allow(''),
+})
+
+router.get('/:Client_ID/blType/', function (req, res, next) {
+    dbConnection.query('SELECT * FROM BlType WHERE Client_ID = ? AND IsActive = 1', [req.params.Client_ID], function (error, results, fields){
+        if(error) return next(error);
+        //if(!results || results.length == 0) return res.status(HTTP_STATUS.NOT_FOUND).send();
+        if(!results || results.length == 0) return res.status(404).send()
+
+        return res.send(results)
+    })
+})
+
+router.get('/:Client_ID/blType/:ID', function (req, res, next) {
+    dbConnection.query('SELECT * FROM BlType WHERE  Client_ID = ? AND IsActive = 1 AND ID = ?', [req.params.Client_ID, req.params.ID], function(error, results, fields) {
+        if(error) return next(error); if(!results||results.length == 0) return res.status(404).send()
+        return res.send(results);
+
+        //if (!results || results.length == 0) return res.status(HTTP_STAUS.NOT_FOUND).send()
+        //var results = results[0];
+        
+        /*var blType = {
+            ID : results[0].ID,
+            BlTypes : results[0].BlTypes,
+            Strategy : results[0].Strategy,
+            Description : results[0].Description,
+            Status : results[0].Status,
+            Client_ID : results[0].Client_ID,
+            Created_By : results[0].Created_By,
+            IsDeleted: results[0].IsDeleted,
+            IsActive: results[0].IsActive,
+            Parent_ID: results[0].Parent_ID,
+            
+        
+            
+        };
+
+       // dbConnection.query('SELECT * FROM ')
+       */
+/*    })
+
+
+
+})
+
+
+/*
+router.get('/:Client_ID/blType/:ID', function(req, res, next) {
+    dbConnection.query('SELECT * FROM BlType WHERE Client_ID = ? AND IsActive = 1 AND ID = ?', [req.params.Client_ID, req.params.ID], function(error, results, fields) {
+
+        if (error) return next(error);
+
+        if(!results || results.length == 0) return res.status(404).send()
+
+        var blType = {
+            ID : results[0].ID,
+            BlTypes : results[0].BlTypes,
+            Strategy : results[0].Strategy,
+            Description : results[0].Description,
+            Status : results[0].Status,
+            Client_ID : results[0].Client_ID,
+            Created_By : results[0].Created_By,
+            IsDeleted: results[0].IsDeleted,
+            IsActive: results[0].IsActive,
+            Parent_ID: results[0].Parent_ID,
+            
+        };
+
+        //dbConnection.query('SELECT ')
+    })
+})
+*/
+
+
+
 var express = require('express');
 const router = express.Router();
 const dbConnection = require('./database')
@@ -49,6 +140,9 @@ router.get('/:Client_ID/blType/:ID', function (req, res, next) {
     })
 
 })
+
+
+
 
 router.post('/:Client_ID/blType/', function(req, res, next) {
     //if(!req.body) return res.status(HTTP_STATUS.BAD_REQUEST).send();

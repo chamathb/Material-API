@@ -5,7 +5,7 @@ const Joi = require('@hapi/joi');
 
 
 router.get('/:Client_ID/stakeHolder/', function (req, res, next) {
-    dbConnection.query('SELECT * FROM Stakeholder WHERE Client_ID = IsActive = 1', req.params.Client_ID, function(error, results, fields) {
+    dbConnection.query('SELECT * FROM Stakeholder WHERE Client_ID = ? AND IsActive = 1', req.params.Client_ID, function(error, results, fields) {
     //dbConnection.query('SELECT * FROM Stakeholder WHERE Client_ID = ?', req.params.Client_ID, function(error, results, fields) { 
     if (error) return next(error);
         if (!results || results.length == 0) return res.status(404).send()
@@ -13,23 +13,23 @@ router.get('/:Client_ID/stakeHolder/', function (req, res, next) {
     });
 });
 
-router.get('/:Client_ID/stakeHolder/:ID', function (req, res) {
-    dbConnection.query('SELECT * FROM Stakeholder WHERE CLient_ID = ? AND ISActive = 1 AND ID = ?', [req.params.Client_ID, req.params.ID], function(error, results, fields) {
+router.get('/:Client_ID/stakeHolder/:ID', function (req, res, next) {
+    dbConnection.query('SELECT * FROM Stakeholder WHERE Client_ID = ? AND IsActive = 1 AND ID = ?', [req.params.Client_ID, req.params.ID], function (error, results, fields) {
         
         if(error) return next (error);
 
         if(!results || results.length == 0) return res.status(404).send()
 
             var staHolder = {
-                ID: result[0].ID,
-                StakeholderName : result[0].StakeholderName,
-                StakeholderType : result[0].StakeholderType,
-                Address : result[0].Address,
-                ClientName : result[0].ClientName,
-                BuisnessRegistration : result[0].BuisnessRegistration,
-                TIN : result[0].TIN,
-                SwiftAddress : result[0].SwiftAddress,
-                PaymentDue : result[0].PaymentDue,
+                ID: results[0].ID,
+                StakeholderName : results[0].StakeholderName,
+                StakeholderType : results[0].StakeholderType,
+                Address : results[0].Address,
+                ClientName : results[0].ClientName,
+                BuisnessRegistration : results[0].BuisnessRegistration,
+                TIN : results[0].TIN,
+                SwiftAddress : results[0].SwiftAddress,
+                PaymentDue : results[0].PaymentDue,
                 Client_ID: results[0].Client_ID,
                 CreatedBy: results[0].CreatedBy,
                 IsDeleted: results[0].false,
@@ -39,7 +39,7 @@ router.get('/:Client_ID/stakeHolder/:ID', function (req, res) {
 
                }
 
-               dbConnection.query('SELECT SHContactDetails. * FROM SHContactDetails INNER JOIN Stakeholder ON SHContactDetails.Stakeholder_ID = Stakeholder_ID WHERE Stakeholder.Client_ID = ? AND STakeholder.ID = ?', [req.params.Client_ID, req.params.ID], function (error, cntcDetailsResults, fields) {
+               dbConnection.query('SELECT SHContactDetails. * FROM SHContactDetails INNER JOIN Stakeholder ON SHContactDetails.Stakeholder_ID = Stakeholder_ID WHERE Stakeholder.Client_ID = ? AND Stakeholder.ID = ?', [req.params.Client_ID, req.params.ID], function (error, cntcDetailsResults, fields) {
 
                 if (error) return next(error);
                 if(!cntcDetailsResults || cntcDetailsResults.length ==0) return res.send(staHolder);
