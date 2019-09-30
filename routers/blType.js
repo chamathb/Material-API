@@ -137,6 +137,7 @@ router.get('/:Client_ID/blType/:ID', function (req, res, next) {
         };
 
        // dbConnection.query('SELECT * FROM ')
+       return res.send(blType)
     })
 
 })
@@ -300,7 +301,7 @@ router.put('/:Client_ID/blType/', function(req, res, next) {
 })
 
 router.delete('/:Client_ID/blType/:ID', function(req, res) {
-    var deletequry = dbConnection.query("UPDATE BlTypes SET IsDeleted = 0, IsActive =  0 WHERE ID = ? AND Client_ID = ? ", [req.params.ID, req.params.Client_ID], function (error, results, fields) {
+    var deletequry = dbConnection.query("UPDATE BlTypes SET IsDeleted = 1, IsActive =  0 WHERE ID = ? AND Client_ID = ? ", [req.params.ID, req.params.Client_ID], function (error, results, fields) {
         if (error) {
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(error);
         } else {

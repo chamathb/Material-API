@@ -155,7 +155,7 @@ router.put('/:Client_ID/stakeHolder', function (req, res) {
     if(!sholder) {
         res.status(400).send({
             error : true,
-            message : "Please provide"
+            message : "Please provide stakeholder details"
         });
 
         res.end();
@@ -274,7 +274,7 @@ router.put('/:Client_ID/stakeHolder', function (req, res) {
 
 router.delete('/stakeHolder/:ID', function (req, res) {
 
-    let sholder_ID = req.params.id;
+    let sholder_ID = req.params.ID;
 
     if (!sholder_ID) {
         res.status(400).send({

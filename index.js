@@ -51,6 +51,9 @@ app.use(blTypeRoutes);
 const stakeHolder = require('./routers/stakeHolder')
 app.use(stakeHolder);
 
+const paymentsTerm = require('./routers/paymentsTerm')
+app.use(paymentsTerm);
+
 app.use((error, req, res, next) => {
     console.error(error)
     if (res.headersSent) {

@@ -30,7 +30,7 @@ router.get('/:Client_ID/regapproval/:id', function (req, res) {
                                 ObtainingStage: results[0].ObtainingStage,
                                 IsActive: results[0].IsActive,
                                 Parent_ID: results[0].Parent_ID,
-                                CreatedBy: results[0].CreatedBy,
+                                Created_By: results[0].CreatedBy,
                                 CreatedTime: results[0].CreatedTime,
                                 Attachments: []}
   
@@ -68,7 +68,7 @@ router.post('/:Client_ID/regapproval', function (req, res) {
     let clientID = req.header('Client_ID')
     let APPROVAL_ID = uuidv4();
 
-    var attachments = regApproval.Attachments
+    var attachments = regApproval.attachments
     var approvall = {
         ID: APPROVAL_ID,
         Client_ID: clientID,
@@ -79,10 +79,10 @@ router.post('/:Client_ID/regapproval', function (req, res) {
         AverageReleaseTime: regApproval.AverageReleaseTime,
         ObtainingStage: regApproval.ObtainingStage,
         IsActive: 1,
-        CreatedBy: userID
+        Created_By: userID
     }
 
-    dbConnection.query("INSERT INTO RegulatoryApproval SET ? ", approvall, function (error, results, fields) {
+    var reGpostsql =   dbConnection.query("INSERT INTO RegulatoryApproval SET ? ", approvall, function (error, results, fields) {
 
         if (error) {
             res.status(500).send(error);
@@ -125,6 +125,8 @@ router.post('/:Client_ID/regapproval', function (req, res) {
             }
         }
     });
+
+    console.log(reGpostsql.sql);
 });
 
 
@@ -352,7 +354,7 @@ router.delete('/regapproval/:id', function (req, res) {
         return
     }
 
-    dbConnection.query("UPDATE BRIDGE.RegulatoryApproval SET  IsDeleted = 1 WHERE ID = ?", [regapproval_id], function (error, results, fields) {
+    var delReg = dbConnection.query("UPDATE BRIDGE.RegulatoryApproval SET  IsDeleted = 1 WHERE ID = ?", [regapproval_id], function (error, results, fields) {
 
         if (error) {
             res.status(500).send(error);
@@ -374,6 +376,8 @@ router.delete('/regapproval/:id', function (req, res) {
         res.end();
         return
     });
+
+    console.log(delReg.sql);
 });
 
 
