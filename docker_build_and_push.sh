@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
-#building the docker file
+# ###########################################################################################################
+# building the docker file
+# sample usage
+# if just wants to build the latest and run the latest
+#   ./docker_build_and_push.sh
+#
+# if you want to update the image you need to provide version as argument.
+# if argument was provided script takes first argument as version and continue the docker
+# image build and will push to remote
+#   ./docker_build_and_push.sh
+#
+#############################################################################################################
 if [ $# -eq 0 ]; then
   echo "starting the docker building of material-api:latest as no argument provided."
   docker build -t rebirthbridge/material-api .
