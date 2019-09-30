@@ -59,7 +59,8 @@ app.use((error, req, res, next) => {
     res.status(500).send();
   });
 // set port
-app.listen(3010, function() {
+app.listen(8080, function() {
+    //ToDo: use log file instead of console log
     console.log('Node app is running on port 3010');
 });
 module.exports = app;
