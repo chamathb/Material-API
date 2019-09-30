@@ -42,14 +42,17 @@ app.use(recepieMapRoutes);
 const taxMapRoutes = require('./routers/taxMap')
 app.use(taxMapRoutes);
 
-const bTypeRoutes = require('./routers/bType')
-app.use(bTypeRoutes);
+const blTypeRoutes = require('./routers/blType')
+app.use(blTypeRoutes);
 
-//const stakeholders = require('./routers/stakeholders')
-//app.use(stakeholders);
+//const bTypeRoutes = require('./routers/bType')
+//app.use(bTypeRoutes);
 
-const stakeholder = require('./routers/stakeholder')
-app.use(stakeholder);
+const stakeHolder = require('./routers/stakeHolder')
+app.use(stakeHolder);
+
+const paymentsTerm = require('./routers/paymentsTerm')
+app.use(paymentsTerm);
 
 app.use((error, req, res, next) => {
     console.error(error)
