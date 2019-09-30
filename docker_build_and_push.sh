@@ -8,7 +8,7 @@
 # if you want to update the image you need to provide version as argument.
 # if argument was provided script takes first argument as version and continue the docker
 # image build and will push to remote
-#   ./docker_build_and_push.sh
+#   ./docker_build_and_push.sh 0.01
 #
 #############################################################################################################
 if [ $# -eq 0 ]; then
