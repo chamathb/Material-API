@@ -6,7 +6,7 @@ if [ $# -eq 0 ]; then
   echo "docker push will not happen since there is no argument for versioning. \n \
   Since there is no argument provided, script has built the latest, which will not be pushed to remote. \n \
   Starting the container assuming you just want to start locally.."
-  docker run -p 9000:3010 -d rebirthbridge/material-api:latest
+  docker run -p 3010:8080 -d rebirthbridge/material-api:latest
 else
   echo "starting the docker building of material-api:${1} as you have provided the version: ${1}"
   docker build -t rebirthbridge/material-api:${1} .
