@@ -1,52 +1,62 @@
+const db =  require('../config/database');
 var express = require('express');
 const router = express.Router();
-var dbConnection = require('./database')
 const Joi = require('@hapi/joi');
 
 router.get('/:Client_ID/hs/', function (req, res, next) {
-
+  const pool = db.getPool();
+  pool.getConnection(function(err, dbConnection) {
+    if (err) {
+      return res.status(500).send("DB Connection Failure!");
+    }
     dbConnection.query('SELECT * FROM HsCodes WHERE Client_ID = ?', req.params.Client_ID, function (error, results, fields) {
-        if (error) return next(error);
-        if (!results || results.length == 0) return res.status(404).send();
-        return res.send(results)
-    })
-})
+      if (error) return next(error);
+      if (!results || results.length == 0) return res.status(404).send();
+      return res.send(results)
+    });
+  });
+});
 
 router.get('/:Client_ID/hs/:id', function (req, res, next) {
-
+  const pool = db.getPool();
+  pool.getConnection(function(err, dbConnection) {
+    if(err) {
+      return res.status(500).send("DB Connection Failure!");
+    }
     dbConnection.query('SELECT * FROM HsCodes WHERE Client_ID = ? AND HsCode = ? ', [req.params.Client_ID, req.params.id], function (error, results, fields) {
-        if (error) return next(error);
-        if (!results || results.length == 0) return res.status(404).send();
+      if (error) return next(error);
+      if (!results || results.length == 0) return res.status(404).send();
 
-        var hsCode = {
-            HsCode: results[0].HsCode,
-            Description: results[0].Description,
-            Unit: results[0].Unit,
-            GenDuty: results[0].GenDuty,
-            VAT: results[0].VAT,
-            PAL: results[0].PAL,
-            NTB: results[0].NTB,
-            Cess: results[0].Cess,
-            Excise: results[0].Excise,
-            SCL: results[0].SCL,
-            MType: results[0].MType,
-            Countries: []
+      var hsCode = {
+        HsCode: results[0].HsCode,
+        Description: results[0].Description,
+        Unit: results[0].Unit,
+        GenDuty: results[0].GenDuty,
+        VAT: results[0].VAT,
+        PAL: results[0].PAL,
+        NTB: results[0].NTB,
+        Cess: results[0].Cess,
+        Excise: results[0].Excise,
+        SCL: results[0].SCL,
+        MType: results[0].MType,
+        Countries: []
+      }
+
+      dbConnection.query('SELECT HsCountries.Country FROM HsCountries INNER JOIN HsCodes ON HsCountries.HsCode = HsCodes.HsCode WHERE HsCodes.Client_ID = ? AND HsCodes.HsCode = ?', [req.params.Client_ID, req.params.id], function (error, countryResults, fields) {
+        if (error) return next(error);
+        if (!countryResults || countryResults.length == 0) return res.send(hsCode);
+
+        countryResults.forEach(extract);
+
+        function extract(item, index) {
+          hsCode.Countries.push(item.Country);
         }
 
-        dbConnection.query('SELECT HsCountries.Country FROM HsCountries INNER JOIN HsCodes ON HsCountries.HsCode = HsCodes.HsCode WHERE HsCodes.Client_ID = ? AND HsCodes.HsCode = ?', [req.params.Client_ID, req.params.id], function (error, countryResults, fields) {
-            if (error) return next(error);
-            if (!countryResults || countryResults.length == 0) return res.send(hsCode);
- 
-            countryResults.forEach(extract);
-
-            function extract(item, index) {
-                hsCode.Countries.push(item.Country);
-            }
-
-            return res.send(hsCode)
-        })
+        return res.send(hsCode)
+      })
     })
-})
+  });
+});
 
 router.put('/:Client_ID/hs/', function (req, res, next) {
     console.error('PUT ------>1');
@@ -74,39 +84,47 @@ router.put('/:Client_ID/hs/', function (req, res, next) {
         let userID = req.header('InitiatedBy')
         let Client_ID = req.header('Client_ID')
         let Countries = req.body.Countries;
+      const pool = db.getPool();
+      pool.getConnection(function(err, dbConnection) {
+        if (err) {
+          return res.status(500).send("DB Connection Failure!");
+        }
 
         dbConnection.query("UPDATE HsCodes SET Description = ? , Unit = ? , GenDuty = ? , VAT = ? , PAL = ? , NTB = ? , Cess = ? ,Excise = ? ,SCL = ? , MType = ? , CreatedBy = ? WHERE HsCode = ? AND Client_ID = ? ", [hs.Description, hs.Unit, hs.GenDuty, hs.VAT, hs.PAL, hs.NTB, hs.Cess, hs.Excise, hs.SCL, hs.MType, userID, hs.HsCode, Client_ID], function (error, results, fields) {
 
-            if (error) return next(error);
+          if (error) return next(error);
 
-            if (!results || results.affectedRows == 0) return res.status(404).send();
+          if (!results || results.affectedRows == 0) return res.status(404).send();
 
-            dbConnection.query("UPDATE HsCountries SET IsActive = 0  WHERE HsCode = ? AND Client_ID = ?", [hs.HsCode, Client_ID], function (error, results, fields) {
-                if (error) {
-                    console.error(error);
-                }
-            });
-
-            Countries.forEach(insert);
-            function insert(item, index) {
-                let country = {
-                    HsCode: hs.HsCode,
-                    Client_ID: Client_ID,
-                    Country: item
-                }
-
-                dbConnection.query("INSERT INTO HsCountries SET ? ", country, function (error, results, fields) {
-                    if (error) {
-                        console.error(error);
-                    }
-                });
+          dbConnection.query("UPDATE HsCountries SET IsActive = 0  WHERE HsCode = ? AND Client_ID = ?", [hs.HsCode, Client_ID], function (error, results, fields) {
+            if (error) {
+              console.error(error);
             }
-            return res.status(200).send(results);
+          });
+
+          Countries.forEach(insert);
+          function insert(item, index) {
+            let country = {
+              HsCode: hs.HsCode,
+              Client_ID: Client_ID,
+              Country: item
+            }
+
+            dbConnection.query("INSERT INTO HsCountries SET ? ", country, function (error, results, fields) {
+              if (error) {
+                console.error(error);
+              }
+            });
+          }
+
+          return res.status(200).send(results);
         });
+      });
     });
 })
 
 router.post('/:Client_ID/hs/', function (req, res) {
+
 
     const schema = Joi.object().keys({
         HsCode: Joi.string(),
@@ -147,44 +165,49 @@ router.post('/:Client_ID/hs/', function (req, res) {
             SCL: hs.SCL,
             MType: hs.MType,
             CreatedBy: userID
+        };
+
+      const pool = db.getPool();
+      pool.getConnection(function(err, dbConnection) {
+        if (err) {
+          return res.status(500).send("DB Connection Failure!");
         }
-
         dbConnection.query("INSERT INTO HsCodes SET ? ", hsCodeObj, function (error, results, fields) {
-            if (error) {
-                console.error(error);
-                res.status(500).send(error);
+          if (error) {
+            console.error(error);
+            res.status(500).send(error);
+          } else {
+            if (!results || results.length == 0) {
+              res.status(404).send();
             } else {
-                if (!results || results.length == 0) {
-                    res.status(404).send();
-                } else {
 
-                    Countries.forEach(insert);
+              Countries.forEach(insert);
 
-                    function insert(item, index) {
-                        let country = {
-                            HsCode: hsCodeObj.HsCode,
-                            Client_ID: hsCodeObj.Client_ID,
-                            Country: item
-                        }
-
-                        dbConnection.query("INSERT INTO HsCountries SET ? ", country, function (error, results, fields) {
-                            if (error) {
-                                console.error(error);
-                            }
-                        });
-                    }
-
-                    res.status(201).send({
-                        error: false,
-                        data: results,
-                        message: 'New regulatory approval has been created successfully.'
-                    });
+              function insert(item, index) {
+                let country = {
+                  HsCode: hsCodeObj.HsCode,
+                  Client_ID: hsCodeObj.Client_ID,
+                  Country: item
                 }
+
+                dbConnection.query("INSERT INTO HsCountries SET ? ", country, function (error, results, fields) {
+                  if (error) {
+                    console.error(error);
+                  }
+                });
+              }
+
+              res.status(201).send({
+                error: false,
+                data: results,
+                message: 'New regulatory approval has been created successfully.'
+              });
             }
-            res.end();
-            return
+          }
+          res.end();
         });
-    })
+      });
+    });
 })
 
 const schema = Joi.object().keys({
@@ -192,15 +215,21 @@ const schema = Joi.object().keys({
 })
 
 router.delete('/:Client_ID/hs/:id', function (req, res, next) {
+  const pool = db.getPool();
+  pool.getConnection(function(err, dbConnection) {
+    if (err) {
+      return res.status(500).send("DB Connection Failure!");
+    }
     dbConnection.query('DELETE FROM HsCodes WHERE Client_ID = ? AND HsCode = ? ', [req.params.Client_ID, req.params.Client_ID], function (error, results, fields) {
 
-        if (error) return next(error);
+      if (error) return next(error);
 
-        if (!results || results.affectedRows == 0) return res.status(404).send();
+      if (!results || results.affectedRows == 0) return res.status(404).send();
 
-        return res.send(results);
+      return res.send(results);
 
     });
+  });
 });
 
 module.exports = router;
